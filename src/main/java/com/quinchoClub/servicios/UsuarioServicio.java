@@ -5,6 +5,7 @@
  */
 package com.quinchoClub.servicios;
 
+import com.quinchoClub.entidades.Propiedad;
 import com.quinchoClub.entidades.Usuario;
 import com.quinchoClub.enumeraciones.Rol;
 import com.quinchoClub.excepciones.MiException;
@@ -214,7 +215,7 @@ public class UsuarioServicio implements UserDetailsService {
         }
     }
     
-    @Transactional
+     @Transactional
     //servicio para actualizar el perfil de usuario, opcion disponible para el usuario, no para el administrador
     public void actualizarPerfil(
             String id,
@@ -242,5 +243,4 @@ public class UsuarioServicio implements UserDetailsService {
     }
     
     
-
 }

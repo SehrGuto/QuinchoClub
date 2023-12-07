@@ -1,11 +1,14 @@
 package com.quinchoClub.controladores;
 import com.quinchoClub.entidades.Propiedad;
 import com.quinchoClub.entidades.ResenaPropiedad;
+import com.quinchoClub.entidades.ResenaUsuario;
 import com.quinchoClub.entidades.Reserva;
 import com.quinchoClub.entidades.Usuario;
 import com.quinchoClub.servicios.PropiedadServicio;
 import com.quinchoClub.servicios.ResenaServicio;
+import com.quinchoClub.servicios.ResenaUsuarioServicio;
 import com.quinchoClub.servicios.UsuarioServicio;
+import java.time.LocalDate;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ public class ResenaControlador {
     private UsuarioServicio usuarioServicio;
     @Autowired
     private PropiedadServicio propiedadServicio;
+    @Autowired
+    private ResenaUsuarioServicio resenaUsuarioServicio;
+    
     @GetMapping("/cargarResenaPropiedad/{id}")
     public String cargarResenaPropiedad(@PathVariable String id,HttpSession session, ModelMap modelo){
         Usuario usuario = (Usuario) session.getAttribute("usuariosession");
@@ -55,17 +61,28 @@ public class ResenaControlador {
     }
     @GetMapping("/cargarResenaUsuario/{id}")
     public String cargarResenaUsuario(){
+        // Lógica para cargar información y mostrar formulario de reseña de usuario
         return "resenasUsuario.html";
     }
-//    @PostMapping("/cargarResenaUsuario/{id}")
-//    @PreAuthorize("hasRole('ROLE_CLIENTE')")
-//    public String cargarResenaUsuario(@PathVariable String autor, ModelMap modelo,@PathVariable String comentario,@PathVariable Integer calificacion,@PathVariable LocalDate fechaComentario) {
-//        ResenaUsuario resena = new ResenaUsuario();
-//        resena.setAutor(autor);
-//        resena.setComentario(comentario);
-//        resena.setCalificacion(calificacion);
-//        resena.setFechaComentario(fechaComentario);
-//        return "resenaUsuario.html";
-//    }
+    @PostMapping("/cargarResenaUsuario/{id}")
+    @PreAuthorize("hasRole('ROLE_PROPIETARIO')")
+    public String cargarResenaUsuario(
+            @PathVariable String id,
+            @RequestParam String autor,
+            @RequestParam String comentario,
+            @RequestParam Integer calificacion,
+            RedirectAttributes redirectAttributes) {
+      try {
+            // Lógica para crear la reseña de usuario
+            Usuario usuario = usuarioServicio.getOne(id);
+            resenaUsuarioServicio.crearResenaUsuario(usuario, comentario, calificacion, autor);
+            
+            redirectAttributes.addFlashAttribute("mensaje", "Reseña de usuario registrada con éxito");
+            return "redirect:/";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Algo salió mal, intenta nuevamente");
+            return "redirect:/resena/cargarResenaUsuario/" + id;
+        }
+    }
     
 }
